@@ -68,6 +68,111 @@ pBBBIORelease (
 // ------------------------------------------------ Public Function Definitions
 //
 
+bool
+BBBIOGet (
+	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
+	char* Buffer,
+	int Size
+	)
+	
+/*++
+
+Routine Description:
+
+	The public version of pBBBIOGet, which sanitizes arguments and wraps reads
+	with a claim/release.
+	
+Arguments:
+
+	Pin - supplies the pin to access
+	
+	Info - supplies what to read from the pin
+	
+	Buffer - supplies a buffer where the read value can be written
+	
+	Size - supplies the size of the provided buffer
+
+Return Value:
+
+	True if the value was successfully written to the buffer, false otherwise.
+	
+--*/
+
+{
+	
+	bool Success;
+
+	if ((Buffer == NULL) ||
+		(Size <= 0)) {
+		
+		Success = false;
+	
+	} else {
+		pBBBIOClaim(Pin);
+		Success = pBBBIOGet(Pin,
+				    	    Info,
+					        Buffer,
+					        Size);
+					        
+        pBBBIORelease(Pin);
+    }
+    
+    return Success;
+}
+
+bool
+BBBIOSet (
+	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
+	char* Value
+	)
+	
+/*++
+
+Routine Description:
+
+	The public version of pBBBIOSet, which sanitizes arguments, wraps calls
+	with a claim and release, and identifies LED calls appropriately.
+	
+Arguments:
+
+	Pin - supplies the pin to be written to
+	
+	Info - supplies which field to write to
+	
+	Value - supplies the value to write
+	
+Return Value:
+
+	True if the pin's value was updated successfully, false otherwise.
+		
+--*/
+
+{
+
+	bool Success;
+	
+	if (Value == NULL) {
+		Success = false;
+		
+	} else {
+		if (Info != BBBIO_INFO_BRIGHTNESS) {
+			pBBBIOClaim(Pin);
+		}
+		
+		Success = pBBBIOSet(Pin,
+							Info,
+							Value);
+							  
+	    if (Info != BBBIO_INFO_BRIGHTNESS) {
+	    	pBBBIORelease(Pin);
+    	}
+	}
+
+	return Success;
+}
+
 //
 // ----------------------------------------------- Private Function Definitions
 //

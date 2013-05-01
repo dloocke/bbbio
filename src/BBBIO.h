@@ -73,8 +73,63 @@ typedef unsigned int BBBIO_PIN;
 // ------------------------------------------------- Public Function Prototypes
 //
 
-//
-// ------------------------------------------------- Public Function Prototypes
-//
+bool
+BBBIOGet (
+	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
+	char* Buffer,
+	int Size
+	);
+	
+/*++
+
+Routine Description:
+
+	The public library "get" routine, which sanitizes arguments and wraps reads
+	with a claim and release.
+	
+Arguments:
+
+	Pin - supplies the pin to access
+	
+	Info - supplies what to read from the pin
+	
+	Buffer - supplies a buffer where the read value can be written
+	
+	Size - supplies the size of the provided buffer
+
+Return Value:
+
+	True if the value was successfully written to the buffer, false otherwise.
+	
+--*/
+
+bool
+BBBIOSet (
+	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
+	char* Value
+	);
+	
+/*++
+
+Routine Description:
+
+	A public library "set" routine, which sanitizes arguments and wraps calls
+	with a claim and release.
+	
+Arguments:
+
+	Pin - supplies the pin to be written to
+	
+	Info - supplies which field to write to
+	
+	Value - supplies the value to write
+	
+Return Value:
+
+	True if the pin's value was updated successfully, false otherwise.
+		
+--*/
 
 #endif
