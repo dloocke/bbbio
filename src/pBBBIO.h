@@ -27,7 +27,7 @@ Environment:
 // ---------------------------------------------------------------- Definitions
 //
 
-#define BBBIO_DEBUG				true
+#define BBBIO_DEBUG				false
 #define BBBIO_SUCCESS			0
 
 //
@@ -35,6 +35,7 @@ Environment:
 //
 
 #define BBBIO_GPIO_DIRECTORY 	"/sys/class/gpio"
+#define BBBIO_LED_DIRECTORY		"/sys/class/leds"
 #define BBBIO_GPIO_EXPORT 		"/sys/class/gpio/export"
 #define BBBIO_GPIO_UNEXPORT 	"/sys/class/gpio/unexport"
 

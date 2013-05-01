@@ -30,13 +30,19 @@ Environment:
 // ---------------------------------------------------------------- Definitions
 //
 
+#define USR0 (1*32 + 21)
+#define USR1 (2*32 + 22)
+#define USR2 (2*32 + 23)
+#define USR3 (2*32 + 24)
+
 //
 // ----------------------------------------------------------- Type Definitions
 //
 
 typedef enum _BBBIO_INFO {
 	BBBIO_INFO_VALUE,
-	BBBIO_INFO_DIRECTION
+	BBBIO_INFO_DIRECTION,
+	BBBIO_INFO_BRIGHTNESS
 
 /*++
 
@@ -47,40 +53,21 @@ Enum. Description:
 	
 Member Descriptions:
 
-	*_VALUE - the value field of a pin. This is brightness for LED pins.
+	*_VALUE - the value field of a pin
 	
 	*_DIRECTION - the direction of a pin, usually "in" or "out"
+	
+	*_BRIGHTNESS - the brightness of an LED pin (doesn't do anything otherwise)
 	
 --*/
 
 } BBBIO_INFO;
 
-typedef struct _BBBIO_PIN {
-	unsigned Header;
-	unsigned int Number;
-	char* Name;
-	unsigned int Index;
+//
+// Pins are defined by their indexing in the file system - so, just an integer.
+//
 
-/*++
-
-Struct Description:
-
-	This struct defines the standard form of a pin on the BeagleBone Black, for
-	use with the BBBIO library.
-  
-Member Descriptions:
-
-	Header - defines which header this pin is on: 0 - P8, 1 - P9
-  
-	Number - defines which pin number this is on that header
-  
-	Name - supplies the string name given to this pin in the documentation
-  
-	Index - supplies the number used to export/unexport this pin
-
---*/
-
-} BBBIO_PIN;
+typedef unsigned int BBBIO_PIN;
 
 //
 // ------------------------------------------------- Public Function Prototypes

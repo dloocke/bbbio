@@ -114,7 +114,7 @@ Return Value:
 					 sizeof(ValueFileName),
 					 "%s/gpio%d/value",
 					 BBBIO_GPIO_DIRECTORY,
-					 Pin.Index);
+					 Pin);
 			break;
 			
 		case BBBIO_INFO_DIRECTION:
@@ -122,9 +122,9 @@ Return Value:
 					 sizeof(ValueFileName),
 					 "%s/gpio%d/direction",
 					 BBBIO_GPIO_DIRECTORY,
-					 Pin.Index);
+					 Pin);
 			break;
-			
+
 		default:
 			return false;
 	}
@@ -176,11 +176,8 @@ Return Value:
 
 {
 
+	int LightIndex;
 	int Success;
-	
-	if (Value == NULL) {
-		return false;
-	}
 							
 	switch (Info) {
 		case BBBIO_INFO_VALUE:
@@ -189,7 +186,7 @@ Return Value:
 					 "echo %s > %s/gpio%d/value 2> /dev/null",
 					 Value,
 					 BBBIO_GPIO_DIRECTORY,
-					 Pin.Index);
+					 Pin);
 			break;	 
 				 
 		case BBBIO_INFO_DIRECTION:
@@ -198,9 +195,65 @@ Return Value:
 					 "echo %s > %s/gpio%d/direction 2> /dev/null",
 					 Value,
 					 BBBIO_GPIO_DIRECTORY,
-					 Pin.Index);
+					 Pin);
 			break;	 
+		
+		case BBBIO_INFO_BRIGHTNESS:
+		
+			//
+			// Decode which light we're talking about.
+			//
 	
+			switch (Pin) {
+				case USR0:
+					LightIndex = 0;
+					break;
+			
+				case USR1:
+					LightIndex = 1;
+					break;
+			
+				case USR2:
+					LightIndex = 2;
+					break;
+			
+				case USR3:
+					LightIndex = 3;
+					break;
+			
+				default:
+					return false;
+			}
+			
+			//
+			// First, set the LED to listen to us.
+			//
+		
+			snprintf(CommandBuffer,
+					 sizeof(CommandBuffer),
+					 "echo gpio > %s/beaglebone:green:usr%d/trigger",
+					 BBBIO_LED_DIRECTORY,
+					 LightIndex);
+					 
+			if (BBBIO_DEBUG) {
+				printf("%s\n", CommandBuffer);
+			}
+					 
+			system(CommandBuffer);
+			
+			//
+			// Now issue the actual command to control brightness.
+			//
+	
+			snprintf(CommandBuffer,
+					 sizeof(CommandBuffer),
+					 "echo %s > %s/beaglebone:green:usr%d/brightness",
+					 Value,
+					 BBBIO_LED_DIRECTORY,
+					 LightIndex);
+			 
+			break;
+			
 		default:
 			return false;
 	}	  
@@ -245,7 +298,7 @@ Return Value:
 	snprintf(CommandBuffer, 
 			 sizeof(CommandBuffer),
 			 "echo %d > %s 2> /dev/null",
-			 Pin.Index,
+			 Pin,
 			 BBBIO_GPIO_EXPORT);
 	
 	//
@@ -292,7 +345,7 @@ Return Value:
 	snprintf(CommandBuffer, 
 			 sizeof(CommandBuffer),
 			 "echo %d > %s 2> /dev/null",
-			 Pin.Index,
+			 Pin,
 			 BBBIO_GPIO_UNEXPORT);
 	
 	//
