@@ -26,6 +26,7 @@ Environment:
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "BBBIO.h"
 #include "pBBBIO.h"
 
 //
@@ -39,25 +40,27 @@ char CommandBuffer[1024] = "";
 //
 
 bool
-pBBBIOGetValue (
+pBBBIOGet (
 	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
 	char* Buffer,
 	int Size
 	);
 
 bool
-pBBBIOSetValue (
+pBBBIOSet (
 	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
 	char* Value
 	);
 	
 bool
-pBBBIOLockPin (
+pBBBIOClaim (
 	BBBIO_PIN Pin
 	);
 
 bool
-pBBBIOUnlockPin (
+pBBBIORelease (
 	BBBIO_PIN Pin
 	);
 	
@@ -70,8 +73,9 @@ pBBBIOUnlockPin (
 //
 
 bool
-pBBBIOGetValue (
+pBBBIOGet (
 	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
 	char* Buffer,
 	int Size
 	)
@@ -80,13 +84,15 @@ pBBBIOGetValue (
 
 Routine Description:
 
-	This routine will get a string value of a particular pin.
+	This routine will get a string from the pin's file system.
 	
 Arguments:
 
-	Pin - supplies the pin whose value to read
+	Pin - supplies the pin to access
 	
-	Buffer - supplies a buffer where the value can be written
+	Info - supplies what to read from the pin
+	
+	Buffer - supplies a buffer where the read value can be written
 	
 	Size - supplies the size of the provided buffer
 
@@ -101,12 +107,27 @@ Return Value:
 	int CharactersRead;
 	FILE* ValueFile;
 	char ValueFileName[256];
-
-	snprintf(ValueFileName,
-			 sizeof(ValueFileName),
-			 "%s/gpio%d/value",
-			 BBBIO_GPIO_DIRECTORY,
-			 Pin.Index);
+	
+	switch (Info) {
+		case BBBIO_INFO_VALUE:
+			snprintf(ValueFileName,
+					 sizeof(ValueFileName),
+					 "%s/gpio%d/value",
+					 BBBIO_GPIO_DIRECTORY,
+					 Pin.Index);
+			break;
+			
+		case BBBIO_INFO_DIRECTION:
+			snprintf(ValueFileName,
+					 sizeof(ValueFileName),
+					 "%s/gpio%d/direction",
+					 BBBIO_GPIO_DIRECTORY,
+					 Pin.Index);
+			break;
+			
+		default:
+			return false;
+	}
 			
 	if (BBBIO_DEBUG) {
 		printf("Opening %s\n", ValueFileName);
@@ -127,8 +148,9 @@ Return Value:
 }
 
 bool
-pBBBIOSetValue (
+pBBBIOSet (
 	BBBIO_PIN Pin,
+	BBBIO_INFO Info,
 	char* Value
 	)
 	
@@ -136,11 +158,13 @@ pBBBIOSetValue (
 
 Routine Description:
 
-	This routine will write a string value to a pin.
+	This routine will write a string value to a field of the given pin.
 	
 Arguments:
 
 	Pin - supplies the pin to be written to
+	
+	Info - supplies which field to write to
 	
 	Value - supplies the value to write
 	
@@ -157,13 +181,29 @@ Return Value:
 	if (Value == NULL) {
 		return false;
 	}
-								  
-	snprintf(CommandBuffer,
-			 sizeof(CommandBuffer),
-			 "echo %s > %s/gpio%d/value 2> /dev/null",
-			 Value,
-			 BBBIO_GPIO_DIRECTORY,
-			 Pin.Index);
+							
+	switch (Info) {
+		case BBBIO_INFO_VALUE:
+			snprintf(CommandBuffer,
+					 sizeof(CommandBuffer),
+					 "echo %s > %s/gpio%d/value 2> /dev/null",
+					 Value,
+					 BBBIO_GPIO_DIRECTORY,
+					 Pin.Index);
+			break;	 
+				 
+		case BBBIO_INFO_DIRECTION:
+			snprintf(CommandBuffer,
+					 sizeof(CommandBuffer),
+					 "echo %s > %s/gpio%d/direction 2> /dev/null",
+					 Value,
+					 BBBIO_GPIO_DIRECTORY,
+					 Pin.Index);
+			break;	 
+	
+		default:
+			return false;
+	}	  
 	
 	if (BBBIO_DEBUG) {
 		printf("%s\n", CommandBuffer);
@@ -174,7 +214,7 @@ Return Value:
 }
 
 bool
-pBBBIOLockPin (
+pBBBIOClaim (
 	BBBIO_PIN Pin
 	)
 	
@@ -221,7 +261,7 @@ Return Value:
 }
 
 bool
-pBBBIOUnlockPin (
+pBBBIORelease (
 	BBBIO_PIN Pin
 	)
 	

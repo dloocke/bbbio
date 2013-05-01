@@ -19,6 +19,9 @@ Environment:
 	
 --*/
 
+#ifndef _BBBIO_H_
+#define _BBBIO_H_
+
 //
 // ------------------------------------------------------------------- Includes
 //
@@ -34,3 +37,9 @@ Environment:
 //
 // ------------------------------------------------- Public Function Prototypes
 //
+
+//
+// ------------------------------------------------- Public Function Prototypes
+//
+
+#endif
